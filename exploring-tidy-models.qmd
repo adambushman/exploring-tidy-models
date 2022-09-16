@@ -1,0 +1,115 @@
+---
+title: "Exploring {tidymodels}"
+author: "Adam Bushman"
+format: html
+from: markdown+emoji
+---
+
+## Introduction
+
+Throughout my BS in Data Science and Statistics, I was introduced to various machine learning algorithms and how to deploy them in R and Python. Within R, the packages, functions, and approach always felt jumbled and difficult to keep straight. Within Python, {sklearn} was a far more natural and friendly suite for data science.
+
+The {tidymodels} suite of packages is the answer and conteporary of {sklearn} in the R ecosystem. My goal is to experiment with the various packages, learn the consistent approach, and resume data science projects and learning thereafter.
+
+The below code and notes are an effort to document my learning and thoughts as a newcomer to the {tidymodels} suite but with a theoretical and practical background to data modeling.
+
+## Setup
+
+Thanks to the Tidyverse, all the packages needed for most data modeling in R are under the {tidymodels} umbrella. Upon installing and loading the library, we'll gain access to all the functionality of the packages therein.
+
+Let's get started by setting up our environment with the libraries.
+
+```{r}
+#| warning: false
+# Install the package if you haven't yet done so
+# install.packages('tidymodels')
+
+# Load the package for use
+library('tidymodels')
+```
+
+With the library ready to go, we'll start exploring each package in turn to get a feel for their purpose and the functions they contain.
+
+## Exploring each package
+
+{tidymodels} features eight core packages used for modeling in the Tidyverse.
+
+### A quick overview
+
+##### [{rsample}](https://rsample.tidymodels.org/)
+
+- Helps with sampling our data
+- We can use the package to set up training and testing sets
+    - "Training sets" are used to train our model how to perform well; this is usually 70-80% of our source data
+    - "Testing sets" are used to test our model and evaluate its performance; this is the other 20-30% of our source data
+- We can also use the package to execute cross-validation of different types
+    - Bootstraps
+    - V-fold
+    - Permutations
+    - And more
+    
+#### [{parsnip}](https://parsnip.tidymodels.org/)
+
+- Provides a framework and flow for implementing a range of models
+- Instead of remembering which model and functions come from which package and the unique properties of each, we can let {parsnip} do the complicated work and use the same format for any model deployment
+- Creating the model object uses familiar Tidyverse syntax with the `%>%` pipe and a `fit()` function at the end
+
+#### [{recipes}](https://recipes.tidymodels.org/)
+
+- Allows us to create a series of steps defining how a model will be assembled
+- Similar to cooking recipes that communicate quantities, ingredients, and sequence of events, we can establish a similar recipe any time we're ready to fit a model
+- Thanks to the Tidyverse, syntax and setup is familiar with the `%>%` pipe
+    
+#### [{workflows}](https://workflows.tidymodels.org/)
+
+- Recipes and models are technically separate, one eventually feeding the other
+- A workflow can bundle them together so everything can stay in the same workspace and come together in a single `fit()` call
+- It's more of less as easy as creatinga workflow and adding a 1) recipe and a 2) model
+- From there we fit on the workflow
+
+#### [{tune}](https://tune.tidymodels.org/)
+
+- This packages allows us to tune our hyperparameters
+- Hyperparameters are values that affect the learning but are defined as constants before training begins
+    - Some basic examples are the train-test split ratio, learning rates, etc.
+        
+#### [{yardstick}](https://yardstick.tidymodels.org/)
+
+- Used to evaluate a model's performance
+- No one wants to calculate performance measures by hand so {yardstick} takes care of that and works with the other packages above
+    
+#### [{broom}](https://broom.tidymodels.org/)
+
+- Gives us insight and summaries of our model
+- Remember, models are objects with lots of components; {broom} helps us keep a pulse on what really matters from the model, such as:
+    - Feature summaries
+    - Feature and overall performance measures
+    - Etc.
+
+#### [{dials}](https://dials.tidymodels.org/)
+
+- {tune} is for getting the hyperparameters optimized, while {dials} gives us an easy way to create and manage them
+
+
+[{modeldata}](https://modeldata.tidymodels.org/) is an included collection of datasets optimized for use with {tidymodels}. From housing to diseases, museums to cricket chrips. There's surely a dataset or two to spike your interest in experimenting with these packages. I'm particularly interested in *Chicago ridership data*, *Sacramento CA home prices*, and *Sample time series drink data*.
+
+There are other, supporting packages for use in data models which require individual library calls. These can be reviewed in depth on the [{tidymodels} Website](https://www.tidymodels.org/packages/#specialized-packages).
+
+When installing and loading {tidymodels}, a couple additional packages are brought along for the ride. They have less to do with data models and more to do with general interaction with data. These are:
+
+- [{dplyr}](): data transformation
+- [{ggplot2}](): visualization 
+- [{purrr}](): iteration
+- [{tibble}](): simplified data frames
+- [{tidyr}](): data frame cleanup
+    
+With that basic understanding of what we're dealing with, let's look at some code and examples from each package one by one.
+
+
+### {rsample}
+
+```{r}
+#| echo: false
+2 * 2
+```
+

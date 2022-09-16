@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adam Bushman">
+
+<title>Exploring {tidymodels}</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="exploring-tidy-models_files/libs/clipboard/clipboard.min.js"></script>
+<script src="exploring-tidy-models_files/libs/quarto-html/quarto.js"></script>
+<script src="exploring-tidy-models_files/libs/quarto-html/popper.min.js"></script>
+<script src="exploring-tidy-models_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="exploring-tidy-models_files/libs/quarto-html/anchor.min.js"></script>
+<link href="exploring-tidy-models_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="exploring-tidy-models_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="exploring-tidy-models_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="exploring-tidy-models_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="exploring-tidy-models_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploring {tidymodels}</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adam Bushman </p>
+          </div>
+  </div>
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Throughout my BS in Data Science and Statistics, I was introduced to various machine learning algorithms and how to deploy them in R and Python. Within R, the packages, functions, and approach always felt jumbled and difficult to keep straight. Within Python, {sklearn} was a far more natural and friendly suite for data science.</p>
+<p>The {tidymodels} suite of packages is the answer and conteporary of {sklearn} in the R ecosystem. My goal is to experiment with the various packages, learn the consistent approach, and resume data science projects and learning thereafter.</p>
+<p>The below code and notes are an effort to document my learning and thoughts as a newcomer to the {tidymodels} suite but with a theoretical and practical background to data modeling.</p>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>Thanks to the Tidyverse, all the packages needed for most data modeling in R are under the {tidymodels} umbrella. Upon installing and loading the library, we’ll gain access to all the functionality of the packages therein.</p>
+<p>Let’s get started by setting up our environment with the libraries.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install the package if you haven't yet done so</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages('tidymodels')</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the package for use</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'tidymodels'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With the library ready to go, we’ll start exploring each package in turn to get a feel for their purpose and the functions they contain.</p>
+</section>
+<section id="exploring-each-package" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-each-package">Exploring each package</h2>
+<p>{tidymodels} features eight core packages used for modeling in the Tidyverse.</p>
+<section id="a-quick-overview" class="level3">
+<h3 class="anchored" data-anchor-id="a-quick-overview">A quick overview</h3>
+<section id="rsample-helps-with-sampling-our-data" class="level5">
+<h5 class="anchored" data-anchor-id="rsample-helps-with-sampling-our-data"><a href="https://rsample.tidymodels.org/">{rsample}</a>: Helps with sampling our data</h5>
+</section>
+<section id="parsnip" class="level4">
+<h4 class="anchored" data-anchor-id="parsnip"><a href="https://parsnip.tidymodels.org/">{parsnip}</a></h4>
+<ul>
+<li>Provides a framework and flow for implementing a range of models</li>
+<li>Instead of remembering which model and functions come from which package and the unique properties of each, we can let {parsnip} do the complicated work and use the same format for any model deployment</li>
+<li>Creating the model object uses familiar Tidyverse syntax with the <code>%&gt;%</code> pipe and a <code>fit()</code> function at the end</li>
+</ul>
+</section>
+<section id="recipes" class="level4">
+<h4 class="anchored" data-anchor-id="recipes"><a href="https://recipes.tidymodels.org/">{recipes}</a></h4>
+<ul>
+<li>Allows us to create a series of steps defining how a model will be assembled</li>
+<li>Similar to cooking recipes that communicate quantities, ingredients, and sequence of events, we can establish a similar recipe any time we’re ready to fit a model</li>
+<li>Thanks to the Tidyverse, syntax and setup is familiar with the <code>%&gt;%</code> pipe</li>
+</ul>
+</section>
+<section id="workflows" class="level4">
+<h4 class="anchored" data-anchor-id="workflows"><a href="https://workflows.tidymodels.org/">{workflows}</a></h4>
+<ul>
+<li>Recipes and models are technically separate, one eventually feeding the other</li>
+<li>A workflow can bundle them together so everything can stay in the same workspace and come together in a single <code>fit()</code> call</li>
+<li>It’s more of less as easy as creatinga workflow and adding a 1) recipe and a 2) model</li>
+<li>From there we fit on the workflow</li>
+</ul>
+</section>
+<section id="tune" class="level4">
+<h4 class="anchored" data-anchor-id="tune"><a href="https://tune.tidymodels.org/">{tune}</a></h4>
+<ul>
+<li>This packages allows us to tune our hyperparameters</li>
+<li>Hyperparameters are values that affect the learning but are defined as constants before training begins
+<ul>
+<li>Some basic examples are the train-test split ratio, learning rates, etc.</li>
+</ul></li>
+</ul>
+</section>
+<section id="yardstick" class="level4">
+<h4 class="anchored" data-anchor-id="yardstick"><a href="https://yardstick.tidymodels.org/">{yardstick}</a></h4>
+<ul>
+<li>Used to evaluate a model’s performance</li>
+<li>No one wants to calculate performance measures by hand so {yardstick} takes care of that and works with the other packages above</li>
+</ul>
+</section>
+<section id="broom" class="level4">
+<h4 class="anchored" data-anchor-id="broom"><a href="https://broom.tidymodels.org/">{broom}</a></h4>
+<ul>
+<li>Gives us insight and summaries of our model</li>
+<li>Remember, models are objects with lots of components; {broom} helps us keep a pulse on what really matters from the model, such as:
+<ul>
+<li>Feature summaries</li>
+<li>Feature and overall performance measures</li>
+<li>Etc.</li>
+</ul></li>
+</ul>
+</section>
+<section id="dials" class="level4">
+<h4 class="anchored" data-anchor-id="dials"><a href="https://dials.tidymodels.org/">{dials}</a></h4>
+<ul>
+<li>{tune} is for getting the hyperparameters optimized, while {dials} gives us an easy way to create and manage them</li>
+</ul>
+<p><a href="https://modeldata.tidymodels.org/">{modeldata}</a> is an included collection of datasets optimized for use with {tidymodels}. From housing to diseases, museums to cricket chrips. There’s surely a dataset or two to spike your interest in experimenting with these packages. I’m particularly interested in <em>Chicago ridership data</em>, <em>Sacramento CA home prices</em>, and <em>Sample time series drink data</em>.</p>
+<p>There are other, supporting packages for use in data models which require individual library calls. These can be reviewed in depth on the <a href="https://www.tidymodels.org/packages/#specialized-packages">{tidymodels} Website</a>.</p>
+<p>When installing and loading {tidymodels}, a couple additional packages are brought along for the ride. They have less to do with data models and more to do with general interaction with data. These are:</p>
+<ul>
+<li><a href="">{dplyr}</a>: data transformation</li>
+<li><a href="">{ggplot2}</a>: visualization</li>
+<li><a href="">{purrr}</a>: iteration</li>
+<li><a href="">{tibble}</a>: simplified data frames</li>
+<li><a href="">{tidyr}</a>: data frame cleanup</li>
+</ul>
+<p>With that basic understanding of what we’re dealing with, let’s look at some code and examples from each package one by one.</p>
+</section>
+</section>
+<section id="rsample" class="level3">
+<h3 class="anchored" data-anchor-id="rsample">{rsample}</h3>
+<ul>
+<li>We can use the package to set up training and testing sets
+<ul>
+<li>“Training sets” are used to train our model how to perform well; this is usually 70-80% of our source data</li>
+<li>“Testing sets” are used to test our model and evaluate its performance; this is the other 20-30% of our source data</li>
+</ul></li>
+<li>We can also use the package to execute cross-validation of different types
+<ul>
+<li>Bootstraps</li>
+<li>V-fold</li>
+<li>Permutations</li>
+<li>And more</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
