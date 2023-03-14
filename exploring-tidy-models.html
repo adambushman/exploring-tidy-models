@@ -148,8 +148,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>{tidymodels} features eight core packages used for modeling in the Tidyverse.</p>
 <section id="a-quick-overview" class="level3">
 <h3 class="anchored" data-anchor-id="a-quick-overview">A quick overview</h3>
-<section id="rsample-helps-with-sampling-our-data" class="level5">
-<h5 class="anchored" data-anchor-id="rsample-helps-with-sampling-our-data"><a href="https://rsample.tidymodels.org/">{rsample}</a>: Helps with sampling our data</h5>
+<section id="rsample" class="level5">
+<h5 class="anchored" data-anchor-id="rsample"><a href="https://rsample.tidymodels.org/">{rsample}</a></h5>
+<ul>
+<li>Helps with sampling our data</li>
+<li>We can use the package to set up training and testing sets
+<ul>
+<li>“Training sets” are used to train our model how to perform well; this is usually 70-80% of our source data</li>
+<li>“Testing sets” are used to test our model and evaluate its performance; this is the other 20-30% of our source data</li>
+</ul></li>
+<li>We can also use the package to execute cross-validation of different types
+<ul>
+<li>Bootstraps</li>
+<li>V-fold</li>
+<li>Permutations</li>
+<li>And more</li>
+</ul></li>
+</ul>
 </section>
 <section id="parsnip" class="level4">
 <h4 class="anchored" data-anchor-id="parsnip"><a href="https://parsnip.tidymodels.org/">{parsnip}</a></h4>
@@ -223,28 +238,82 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>With that basic understanding of what we’re dealing with, let’s look at some code and examples from each package one by one.</p>
 </section>
 </section>
-<section id="rsample" class="level3">
-<h3 class="anchored" data-anchor-id="rsample">{rsample}</h3>
-<ul>
-<li>We can use the package to set up training and testing sets
-<ul>
-<li>“Training sets” are used to train our model how to perform well; this is usually 70-80% of our source data</li>
-<li>“Testing sets” are used to test our model and evaluate its performance; this is the other 20-30% of our source data</li>
-</ul></li>
-<li>We can also use the package to execute cross-validation of different types
-<ul>
-<li>Bootstraps</li>
-<li>V-fold</li>
-<li>Permutations</li>
-<li>And more</li>
-</ul></li>
-</ul>
+<section id="rsample-1" class="level3">
+<h3 class="anchored" data-anchor-id="rsample-1">{rsample}</h3>
+<p>For exploring this package, we’ll use the <code>Sacramento</code> dataset. We preview the data set below:</p>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sac_data <span class="ot">&lt;-</span> modeldata<span class="sc">::</span>Sacramento</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sac_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+<pre><code># A tibble: 932 x 9
+   city           zip     beds baths  sqft type        price latitude longitude
+   &lt;fct&gt;          &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;       &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1 SACRAMENTO     z95838     2     1   836 Residential 59222     38.6     -121.
+ 2 SACRAMENTO     z95823     3     1  1167 Residential 68212     38.5     -121.
+ 3 SACRAMENTO     z95815     2     1   796 Residential 68880     38.6     -121.
+ 4 SACRAMENTO     z95815     2     1   852 Residential 69307     38.6     -121.
+ 5 SACRAMENTO     z95824     2     1   797 Residential 81900     38.5     -121.
+ 6 SACRAMENTO     z95841     3     1  1122 Condo       89921     38.7     -121.
+ 7 SACRAMENTO     z95842     3     2  1104 Residential 90895     38.7     -121.
+ 8 SACRAMENTO     z95820     3     1  1177 Residential 91002     38.5     -121.
+ 9 RANCHO_CORDOVA z95670     2     2   941 Condo       94905     38.6     -121.
+10 RIO_LINDA      z95673     3     2  1146 Residential 98937     38.7     -121.
+# ... with 922 more rows</code></pre>
 </div>
 </div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+<p>This package is all about sampling. The documentation is a bit out of order from a sequence of events, but here’s how I interpret it.</p>
+<p>Often we want to chunk up our data set right off the bat into “training” and “testing”. We do this with the <code>initial_split</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">814</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>split_obj <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(sac_data, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>sac_train <span class="ot">&lt;-</span> <span class="fu">training</span>(split_obj)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>sac_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(split_obj)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sac_data) <span class="co"># Total observations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 932</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sac_train) <span class="co"># Training observations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 745</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sac_test) <span class="co"># Testing observations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 187</code></pre>
+</div>
+</div>
+<p>There are some properties to group splits by a certain variable but for the moment I’m not concerned with that angle.</p>
+<p>Ultimately, with data science, it’s not enough to train and/or test a single time. It’s important to ensure statistically that the performance we’re seeing isn’t due to chance.</p>
+<p>At this stage, we want to resample from a training or testing set. The documentation explains that an <code>rset</code> class is used to make a collection of resamples. If we did a 5-fold cross-validation, we’d see 5 resamples in a collection of an <code>rset</code> class.</p>
+<p>From the documentation, it appears we create these “resamples” using some of the cross-validation functions. We’ll take a look with “bootstraps”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bt_resamples <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">bootstraps</span>(sac_test, <span class="dv">5</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bt_resamples</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Bootstrap sampling 
+# A tibble: 5 x 2
+  splits           id        
+  &lt;list&gt;           &lt;chr&gt;     
+1 &lt;split [187/73]&gt; Bootstrap1
+2 &lt;split [187/66]&gt; Bootstrap2
+3 &lt;split [187/69]&gt; Bootstrap3
+4 &lt;split [187/71]&gt; Bootstrap4
+5 &lt;split [187/68]&gt; Bootstrap5</code></pre>
+</div>
+</div>
+<p>We can see the five splits and their id. Each split has some figures listed. If we take a closer peek, there’s a label for the list and the documentation explains further:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bt_resamples<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;Analysis/Assess/Total&gt;
+&lt;187/73/187&gt;</code></pre>
+</div>
+</div>
+<p>{rsample} clarifies that “Analysis” means those that were selected for the resample. Because we used the bootstrap method, all of the source data is included in the analysis.</p>
+<p>The “Assessment” section is described as what’s left out of the the analysis set. I’m unclear if that applies to this example or not.</p>
+<p>From my vantage point, the terminology is weird but the key is that this exercise succeeds a train-test split.</p>
 </section>
 </section>
 
