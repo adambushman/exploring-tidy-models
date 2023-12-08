@@ -1,0 +1,76 @@
+---
+title: "Basic {tidymodels} example"
+author: "Adam BUshman"
+output: html_document
+---
+
+# Basic {tidymodels} examples
+
+In my learning path of {tidymodels}, I'm creating this resource as a start guide for creating many of the core model types. They will be small, getting started examples that can be repurposed into grander projects.
+
+
+## Setup
+
+```{r}
+#| echo: FALSE
+
+library('tidyverse')
+library('tidymodels')
+library('broom')
+```
+
+
+## Linear Regression
+
+Using the car prices data set from {modeldata}, wherein we'll look to model the price of a car models based on discrete and continuous variables like mileage, cylinders, body type, etc.
+
+```{r}
+data_lmr <- modeldata::car_prices
+```
+
+```{r}
+lmr_mod <-
+  linear_reg() %>%
+  set_mode("regression") %>%
+  set_engine("lm")
+
+lmr_mod
+```
+
+We initially call the model we want to use. Then, we set the mode (only one choice for this model). Then, we set the engine (only one choice for this model).
+
+```{r}
+fit_lmr <-
+  lmr_mod %>%
+  fit(Price ~ ., data = data_lmr)
+
+fit_lmr
+```
+
+With the model defined, we now "fit" (define which variables are independent and which are dependent). 
+
+```{r}
+fit_lmr %>%
+  pluck("fit") %>%
+  summary()
+```
+
+With the model fit to the data, we can inspect the summary easily enough by extracting it from the fit object.
+
+```{r}
+# Fit summary put in a tibble
+fit_lmr %>% 
+  tidy()
+
+# Summary statistics put in a tibble
+fit_lmr %>%
+  glance()
+
+# Appends the fitted and residual values to the original data
+fit_lmr %>%
+  pluck("fit") %>%
+  augment()
+```
+
+We should now tidy up the output for easier use in plotting and table generation.
+
