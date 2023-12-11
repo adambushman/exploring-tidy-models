@@ -74,3 +74,40 @@ fit_lmr %>%
 
 We should now tidy up the output for easier use in plotting and table generation.
 
+```{r}
+new_data <- tibble(
+  Mileage = c(23000,7000), 
+  Cylinder = c(4, 4), 
+  Doors = c(4, 4), 
+  Cruise = c(1, 1), 
+  Sound = c(1,1), 
+  Leather = c(0, 1), 
+  Buick = c(0, 0), 
+  Cadillac = c(0, 0), 
+  Chevy = c(1, 0), 
+  Pontiac = c(0, 0), 
+  Saab = c(0, 0), 
+  Saturn = c(0, 0), 
+  convertible = c(0, 0), 
+  coupe = c(0, 0), 
+  hatchback = c(0, 1), 
+  sedan = c(1, 0), 
+  wagon = c(0, 0)
+)
+
+```
+
+```{r}
+predict(fit_lmr, new_data = new_data)
+
+predict(
+  fit_lmr, new_data = new_data, 
+  type = "pred_int", 
+  level = 0.9
+)
+```
+
+We now predict some values with new data!
+
+
+## 
