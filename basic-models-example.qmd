@@ -110,4 +110,153 @@ predict(
 We now predict some values with new data!
 
 
-## 
+## Decision Trees
+
+### Regression
+
+```{r}
+data_dtr <- modeldata::concrete
+```
+
+```{r}
+dtr_mod <-
+  decision_tree() %>%
+  set_mode("regression") %>%
+  set_engine("rpart")
+
+dtr_mod
+```
+The model to use is a decision tree, mode ebeing regression, and the engine being rpart.
+
+```{r}
+fit_dtr <-
+  dtr_mod %>%
+  fit(compressive_strength ~ ., data = data_dtr)
+
+fit_dtr
+```
+
+
+```{r}
+# Visualizes the variable importance level of each feature
+vip::vip(fit_dtr$fit)
+```
+
+Let's fit the model to the data!
+
+```{r}
+new_data <- tibble(
+  cement = c(240.0, 600.0), 
+  blast_furnace_slag = c(5.0, 12.0), 
+  fly_ash = c(0.0, 0.0), 
+  water = c(192, 162), 
+  superplasticizer = c(2.5, 0.0), 
+  coarse_aggregate = c(921.0, 1061.0), 
+  fine_aggregate = c(621.0, 331.0), 
+  age = c(90, 200)
+)
+```
+
+
+```{r}
+predict(fit_dtr, new_data = new_data)
+```
+
+Let's assess the model now with new data!
+
+### Classification
+
+```{r}
+data_dtc <- modeldata::penguins %>% filter(!is.na(bill_length_mm))
+
+split_data <- rsample::initial_split(data_dtc)
+
+train_set <- rsample::training(split_data)
+test_set <- rsample::testing(split_data)
+```
+
+```{r}
+dtc_mod <-
+  decision_tree(tree_depth = 3) %>%
+  set_mode("classification") %>%
+  set_engine("rpart")
+
+dtc_mod
+```
+The model to use is a decision tree, mode being classification, and the engine being rpart.
+
+```{r}
+fit_dtc <-
+  dtc_mod %>%
+  fit(species ~ ., data = train_set)
+
+fit_dtc
+```
+
+```{r}
+# Visualizes the variable importance level of each feature
+vip::vip(fit_dtc$fit)
+```
+
+```{r}
+predictions <- predict(fit_dtc, test_set)
+results <- tibble(predicted = predictions$.pred_class, observed = test_set$species)
+```
+
+Looking at the results.
+
+```{r}
+results %>%
+  yardstick::metrics(truth = observed, estimate = predicted)
+```
+
+### Tuning a tree
+
+```{r}
+data_dtt <- modeldata::credit_data
+
+split_data <- rsample::initial_split(data_dtt)
+
+train_set <- rsample::training(split_data)
+test_set <- rsample::testing(split_data)
+```
+
+```{r}
+dtt_mod <-
+  decision_tree(tree_depth = tune()) %>%
+  set_mode("classification") %>%
+  set_engine("rpart")
+```
+
+```{r}
+# Define a recipe (the steps)
+dtt_recipe <- recipe(Status ~ ., data = train_set)
+
+# Create a workflow (the things to do over and over again)
+dtt_workflow <- workflow() %>%
+  add_model(dtt_mod) %>%
+  add_recipe(dtt_recipe)
+
+# Specify a grid (where to list the results)
+dtt_grid <- expand.grid(tree_depth = seq(1,10))
+
+# Specify the tuning (how to run the workflow)
+dtt_tune <- tune_grid(
+  dtt_workflow, 
+  resamples = rsample::bootstraps(train_set, times = 5), 
+  grid = dtt_grid, 
+  metrics = metric_set(accuracy)
+)
+```
+
+```{r}
+results <- 
+  dtt_tune %>%
+  unnest(.metrics)
+
+
+ggplot(results, aes(x = tree_depth, y = .estimate)) +
+  geom_point() +
+  stat_smooth() +
+  scale_x_discrete()
+```
