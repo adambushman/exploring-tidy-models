@@ -52,7 +52,10 @@ summary(zoo)
 # Turn `class_type` to a factor
 zoo <- 
   zoo %>%
+  select(-animal_name) %>%
   mutate(
+    across(hair:fins, ~ as.logical(.)), 
+    across(tail:catsize, ~ as.logical(.)), 
     class_type = factor(class_type)
   )
 
@@ -122,6 +125,56 @@ results <-
 ggplot(results, aes(x = tree_depth, y = .estimate)) +
   geom_point() +
   stat_smooth() +
-  scale_x_discrete()
+  scale_x_continuous(
+    breaks = results$tree_depth
+  )
+
+```
+
+# Constructing a model with max depth of 4
+
+```{r}
+
+# Official model
+z_mod_o <- 
+  update(
+    z_mod, 
+    tree_depth = 4
+  )
+
+# Official workflow
+z_wfl_o <- 
+  workflow() %>% 
+  add_model(z_mod_o) %>% 
+  add_recipe(z_rec)
+
+# Fitting the training data
+z_fit <-
+  z_wfl_o %>%
+  fit(data = z_train)
+
+```
+
+# Evaluating the model
+
+```{r}
+
+# Predicting the testing data based on training
+z_pred <- 
+  z_fit %>%
+  predict(new_data = z_test)
+
+# Assembling results 
+results <- tibble(
+  predicted = z_pred$.pred_class, 
+  observed = z_test$class_type
+)
+
+# Comparing results
+results %>%
+  yardstick::metrics(
+    truth = observed, 
+    estimate = predicted
+  )
 
 ```
