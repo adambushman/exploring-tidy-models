@@ -98,3 +98,36 @@ lap_data_c <-
 
 ```
 
+
+# Setup training and testing sets
+
+```{r}
+
+# Defining a split
+lap_split <- initial_split(lap_data_c)
+
+# Data sets
+lap_train <- training(lap_split)
+lap_test <- testing(lap_split)
+
+```
+
+
+# Defining the model, recipe
+
+```{r}
+
+# Model
+lap_mod <- 
+  decision_tree(tree_depth = tune()) %>%
+  set_engine("spark") %>%
+  set_mode("regression")
+
+# Recipe
+lap_rec <-
+  recipe(Price_euros ~ ., data) %>%
+  update_role(laptop_ID, Product, Cpu, Gpu, new_role = "ID")
+
+
+```
+
