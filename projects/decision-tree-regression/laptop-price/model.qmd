@@ -214,3 +214,65 @@ final_fit <-
 ```
 
 
+Sampling some of the laptop records and the predicted vs actual prices.
+
+```{r}
+
+# Compiling the results
+results <- 
+  tibble(
+    Product = lap_test$Product, 
+    actual = lap_test$Price_euros, 
+    pred = final_fit$.predictions[[1]]$.pred
+  )
+
+set.seed(814)
+
+# Getting a sample
+results_sample <-
+  results %>%
+  sample_n(10)
+
+```
+
+```{r}
+
+# Plot
+ggplot(results_sample) +
+  geom_segment(
+    aes(x = actual, xend = pred, y = Product, yend = Product), 
+    linewidth = 1.25, 
+    color = "lightgray"
+  ) +
+  geom_point(
+    aes(x = actual, y = Product), 
+    size = 2.5, 
+    color = "#A76571"
+  ) +
+  geom_point(
+    aes(x = pred, y = Product), 
+    size = 2.5, 
+    color = "#565676"
+  ) +
+  scale_x_continuous(
+    labels = scales::label_currency(prefix = "€")
+  ) +
+  labs(
+    title = glue::glue(
+      "<span style='color: #A76571'>**Actual**</span> vs ", 
+      "<span style='color: #565676'>**Predicted**</span>" 
+    ), 
+    x = "Price in Euros"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = ggtext::element_markdown(), 
+    panel.grid.major.y = element_blank(), 
+    panel.grid.minor.y = element_blank(), 
+    panel.grid.minor.x = element_blank(), 
+    axis.title.y = element_blank()
+  )
+
+```
+
+
