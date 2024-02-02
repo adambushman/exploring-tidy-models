@@ -119,15 +119,98 @@ lap_test <- testing(lap_split)
 
 # Model
 lap_mod <- 
-  decision_tree(tree_depth = tune()) %>%
-  set_engine("spark") %>%
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>%
+  set_engine("rpart") %>%
   set_mode("regression")
 
 # Recipe
 lap_rec <-
-  recipe(Price_euros ~ ., data) %>%
+  recipe(Price_euros ~ ., data = lap_train) %>%
   update_role(laptop_ID, Product, Cpu, Gpu, new_role = "ID")
 
+```
+
+# Setting up the workflow and tuning
+
+```{r}
+
+# Workflow
+lap_wkf <- 
+  workflow() %>%
+  add_model(lap_mod) %>%
+  add_recipe(lap_rec)
+
+# Tuning grid
+lap_grid <- grid_regular(
+  cost_complexity(),
+  tree_depth(),
+  levels = 5
+)
+
+# Setting up the tuning
+lap_tune <- 
+  lap_wkf %>%
+  tune_grid(
+    resamples = vfold_cv(lap_train), 
+    grid = lap_grid
+  )
 
 ```
+
+# Evaluating metrics
+
+```{r}
+
+# Collecting metrics
+metrics <- 
+  lap_tune %>% 
+  collect_metrics() 
+
+# Plotting results
+metrics %>%
+  filter(.metric == "rmse") %>%
+  ggplot(aes(as.factor(cost_complexity), as.factor(tree_depth))) +
+    geom_point(
+      aes(size = mean), 
+      alpha = 0.2
+    ) +
+    labs(
+      x = "Cost Complexity", 
+      y = "Tree Depth"
+    )
+
+```
+
+Cost complexity of `0.000562` and a tree depth of `8` seems like a nice balance. Only marginal gains are achieved with anything better.
+
+```{r}
+
+# Choosing the hyperparameters
+best_tree <- 
+  metrics %>%
+  mutate(id = 1:nrow(.)) %>%
+  filter(id == 28) %>%
+  select(cost_complexity, tree_depth, .config)
+
+# Finalize the workflow
+final_wkf <- 
+  lap_wkf %>% 
+  finalize_workflow(best_tree)
+
+```
+
+Fitting a final model.
+
+```{r}
+
+# Fit the final model based on the workflow
+final_fit <- 
+  final_wkf %>%
+  last_fit(lap_split) 
+
+```
+
 
